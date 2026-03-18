@@ -1,4 +1,5 @@
-# 622149-IMS-Jeeva
+# IMS
+
 
 
 
@@ -20,9 +21,7 @@ git branch -M main
 git push -uf origin main
 ```
 
-## Integrate with your tools
 
-- [ ] [Set up project integrations](https://git-trg.htcindia.com/seed69-springboot-project/622149-ims-jeeva/-/settings/integrations)
 
 ## Collaborate with your team
 
