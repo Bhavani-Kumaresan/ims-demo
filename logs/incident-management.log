@@ -1,0 +1,1 @@
+2026-01-24 14:05:01 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@52fc6914 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
