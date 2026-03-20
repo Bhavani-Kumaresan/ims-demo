@@ -25,6 +25,56 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
+/**
+ * REST API Controller for managing ticket categories in the Incident Management System.
+ * 
+ * <h2>Overview</h2>
+ * This controller provides RESTful endpoints for CRUD operations on ticket categories.
+ * Categories are used to classify and organize incident tickets within the system.
+ * 
+ * <h2>Security</h2>
+ * All endpoints in this controller are restricted to users with the <code>ADMIN</code> role.
+ * Authentication is enforced via Bearer token in the Authorization header.
+ * 
+ * <h2>Endpoints</h2>
+ * <ul>
+ *   <li><strong>GET /api/categories/getAllCategories</strong> - Retrieve all available categories</li>
+ *   <li><strong>GET /api/categories/{id}</strong> - Retrieve a specific category by ID</li>
+ *   <li><strong>POST /api/categories/create</strong> - Create a new category (category name must be unique)</li>
+ *   <li><strong>PUT /api/categories/update/{id}</strong> - Update an existing category</li>
+ *   <li><strong>DELETE /api/categories/{id}</strong> - Delete a category (blocked if tickets reference it)</li>
+ * </ul>
+ * 
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li><b>Unique Category Names:</b> The system enforces unique category names to prevent duplicates</li>
+ *   <li><b>Referential Integrity:</b> Categories cannot be deleted if they are referenced by existing tickets</li>
+ *   <li><b>Comprehensive Error Handling:</b> Custom exceptions for entity not found, duplicate names, and invalid input</li>
+ *   <li><b>OpenAPI Documentation:</b> All endpoints are documented with Swagger/OpenAPI annotations for API discovery</li>
+ * </ul>
+ * 
+ * <h2>Typical Usage Flow</h2>
+ * <ol>
+ *   <li>Admin users authenticate and receive a Bearer token</li>
+ *   <li>Admin retrieves all categories for reference or management purposes</li>
+ *   <li>Admin creates new categories as needed for ticket classification</li>
+ *   <li>Admin updates category details when changes are required</li>
+ *   <li>Admin deletes categories when they are no longer needed (if no tickets reference them)</li>
+ * </ol>
+ * 
+ * <h2>Data Model</h2>
+ * <ul>
+ *   <li><b>Category:</b> Contains category ID and name properties used to classify tickets</li>
+ *   <li><b>CategoryResponse:</b> DTO used in API responses for retrieving category lists</li>
+ * </ul>
+ * 
+ * @see com.htc.incidentmanagement.service.CategoryService
+ * @see com.htc.incidentmanagement.model.Category
+ * @see com.htc.incidentmanagement.dto.CategoryResponse
+ * 
+ * @author Incident Management System Team
+ * @version 1.0
+ */
 @PreAuthorize("hasRole('ADMIN')")
 @RestController
 @SecurityRequirement(name = "bearerAuth")
@@ -67,6 +117,25 @@ public class CategoryController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(created);
         }
 
+        /**
+         * Updates an existing category by its ID.
+         * 
+         * This endpoint allows clients to update a category's information. The new category name
+         * must be unique within the system. The category is identified by its ID path variable.
+         * 
+         * @param id the unique identifier of the category to be updated (must exist in the system)
+         * @param category the Category object containing the updated information
+         * 
+         * @return ResponseEntity containing the updated Category object with HTTP status 200 (OK)
+         *         if the update is successful
+         * 
+         * @throws EntityNotFoundException if no category with the given ID is found (HTTP 404)
+         * @throws DuplicateNameException if the new category name already exists in the system (HTTP 400)
+         * @throws InvalidInputException if the provided input is invalid or malformed (HTTP 400)
+         * 
+         * @see Category
+         * @see com.htc.incidentmanagement.service.CategoryService#updateCategory(Long, Category)
+         */
         @Operation(summary = "Update category", description = "Updates an existing category's name by ID. New name must be unique")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Category updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
@@ -84,8 +153,8 @@ public class CategoryController {
                         @ApiResponse(responseCode = "404", description = "Category not found", content = @Content),
                         @ApiResponse(responseCode = "409", description = "Cannot delete - tickets exist", content = @Content)
         })
-        @DeleteMapping("/delete/{id}")
-        public ResponseEntity<Void> delete(@PathVariable Long id) {
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
                 categoryService.deleteCategory(id);
                 return ResponseEntity.noContent().build();
         }
